@@ -7,6 +7,7 @@
 #'
 #' @import ggplot2
 
+#a function to create a df of rows and columns representing the board
 create_board <- function(){
   #create a df of combinations of letters and numbers for each chess square (A1, A2.. B1...H8)
   chess_board <- data.frame(col = rep(1:8, each = 8),
@@ -16,7 +17,8 @@ create_board <- function(){
   return(chess_board)
 }
 
-plot_board <- function(light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = yes){
+#a function to create a base plot of just the board upon which we will add pieces
+plot_board <- function(light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = TRUE){
   #create the board df
   chess_board <- create_board()
 
@@ -42,4 +44,24 @@ plot_board <- function(light_col = "#f5f5dc", dark_col = "#00688b", square_label
 
   return(p_board)
 }
+
+#a function to create a df of the original board position at the start
+setup_board <- function(){
+  back_row <- c("R", "N", "B", "Q", "K", "B", "N", "R")
+  pawns <- rep("p", 8)
+  initial_pieces <- c(back_row, pawns, pawns, back_row)
+  initial_poisitons <- paste0(rep(letters[1:8], 4), rep(c(1:2, 7:8), each = 8))
+  initial_colours <- rep(c("W", "B"), each = 16)
+
+  initial_board <- data.frame(move = rep(0, 32),
+                              player = as.character(rep(NA, 32)),
+                              piece = initial_pieces,
+                              piece_position_before = as.character(initial_poisitons),
+                              piece_position_after = as.character(initial_poisitons),
+                              piece_colour = initial_colours,
+                              movement = as.character(rep(NA, 32)))
+
+  return(initial_board)
+}
+
 
