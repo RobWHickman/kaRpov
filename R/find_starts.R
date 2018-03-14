@@ -172,7 +172,8 @@ find_pawn_position <- function(move, move_colour, current_move_df){
     if(length(matching_pawns) > 1){
       possible_pawns <- current_move_df$piece_position_before[matching_pawns]
       pawn_ranks <- as.numeric(gsub("[a-z]", "", possible_pawns))
-      matching_pawns <- possible_pawns[which(abs(col-y)==min(abs(col-y)))]
+      matching_pawns <- possible_pawns[which(abs(col-pawn_ranks)==min(abs(col-pawn_ranks)))]
+      matching_pawns <- which(current_move_df$piece_position_before == matching_pawns)
     }
     matching_pawn <- matching_pawns
 

@@ -21,6 +21,9 @@ add_next_move <- function(move, move_colour, current_move_df){
   if(grepl("^[a-z]", move)){
     #pawn move
     moving_piece_index <- find_pawn_position(move, move_colour, current_move_df)
+    if(grepl("=", move)){
+      current_move_df$piece[moving_piece_index] <- gsub(".*=", "", move)
+    }
   } else if(grepl("K", move)){
     #king move
     moving_piece_index <- find_king_position(move, move_colour, current_move_df)
