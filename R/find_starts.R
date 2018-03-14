@@ -62,7 +62,7 @@ check_diaganols <- function(row, col, current_move_df){
 }
 
 #taken from https://stackoverflow.com/questions/49028617/subtract-1-letter-and-number-from-multiple-strings-of-letters-and-numbers
-find_knight_position <- function(move, current_move_df){
+find_knight_position <- function(move, move_colour, current_move_df){
   #clean up the move
   final_position <- split_position(clean_move(move))
   row <- final_position[1]
@@ -99,7 +99,7 @@ find_knight_position <- function(move, current_move_df){
   }
   return(matching_knight)
 }
-find_rook_position <- function(move, current_move_df){
+find_rook_position <- function(move, move_colour, current_move_df){
   #clean up the move
   final_position <- split_position(clean_move(move))
   row <- final_position[1]
@@ -120,7 +120,7 @@ find_rook_position <- function(move, current_move_df){
   }
   return(matching_rook)
 }
-find_bishop_position <- function(move, current_move_df){
+find_bishop_position <- function(move, move_colour, current_move_df){
   #clean up the move
   final_position <- split_position(clean_move(move))
   row <- final_position[1]
@@ -139,7 +139,7 @@ find_bishop_position <- function(move, current_move_df){
   }
   return(matching_bishop)
 }
-find_queen_position <- function(move, current_move_df){
+find_queen_position <- function(move, move_colour, current_move_df){
   #clean up the move
   final_position <- split_position(clean_move(move))
   row <- final_position[1]
@@ -159,7 +159,7 @@ find_queen_position <- function(move, current_move_df){
   }
   return(matching_queen)
 }
-find_pawn_position <- function(move, current_move_df){
+find_pawn_position <- function(move, move_colour, current_move_df){
   #clean up the move
   final_position <- split_position(clean_move(move))
   row <- final_position[1]
@@ -189,7 +189,7 @@ find_pawn_position <- function(move, current_move_df){
   }
   return(matching_pawn)
 }
-find_king_position <- function(move, current_move_df){
+find_king_position <- function(move, move_colour, current_move_df){
   king_index <- which(current_move_df$piece_colour == move_colour &
                         current_move_df$piece == "K")
   return(king_index)

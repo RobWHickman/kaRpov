@@ -20,22 +20,22 @@ add_next_move <- function(move, move_colour, current_move_df){
   #find the index of the moving piece
   if(grepl("^[a-z]", move)){
     #pawn move
-    moving_piece_index <- find_pawn_position(move, current_move_df)
+    moving_piece_index <- find_pawn_position(move, move_colour, current_move_df)
   } else if(grepl("K", move)){
     #king move
-    moving_piece_index <- find_king_position(move, current_move_df)
+    moving_piece_index <- find_king_position(move, move_colour, current_move_df)
   } else if(grepl("Q", move)){
     #queen move
-    moving_piece_index <- find_queen_position(move, current_move_df)
+    moving_piece_index <- find_queen_position(move, move_colour, current_move_df)
   } else if(grepl("B", move)){
     #bishop move
-    moving_piece_index <- find_bishop_position(move, current_move_df)
+    moving_piece_index <- find_bishop_position(move, move_colour, current_move_df)
   } else if(grepl("R", move)){
     #rook move
-    moving_piece_index <- find_rook_position(move, current_move_df)
+    moving_piece_index <- find_rook_position(move, move_colour, current_move_df)
   } else if(grepl("N", move)){
     #knight move
-    moving_piece_index <- find_knight_position(move, current_move_df)
+    moving_piece_index <- find_knight_position(move, move_colour, current_move_df)
     #castling
   }
     #move the piece
@@ -45,7 +45,7 @@ add_next_move <- function(move, move_colour, current_move_df){
   king_row <- which(current_move_df$piece_colour == move_colour & current_move_df$piece == "K")
   rook_rows <- which(current_move_df$piece_colour == move_colour & current_move_df$piece == "R")
   if(move == "O-O"){
-    rook_row <- rook_rows[which(current_move_df$piece_position_before[rook_rows] == "h8")]
+    rook_row <- rook_rows[grep("h", current_move_df$piece_position_before[rook_rows])]
     current_move_df$piece_position_after[king_row] <- gsub("e", "g", current_move_df$piece_position_before[king_row])
     current_move_df$piece_position_after[rook_row] <- gsub("h", "f", current_move_df$piece_position_before[rook_row])
   } else if(move == "O-O-O"){

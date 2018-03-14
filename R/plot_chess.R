@@ -32,26 +32,26 @@ tween_moves <- function(all_moves_df, frames = 200){
 }
 
 #functions to get the png images of the chess pieces to be plotted via ggplot2
-get_piece_image <- function(name) {
+get_piece_image <- function(piece) {
   rasterGrob(readPNG(paste0(find.package("kaRpov"), "/data/", piece, ".png")))
 }
 add_pieces <- function(row, col, piece_id, size) {
   piece <- gsub("\\.[0-9]", "", piece_id)
   annotation_custom(get_piece_image(piece),
-                    xmin = x - size, xmax = x + size,
-                    ymin = y - size, ymax = y + size)
+                    xmin = row - size, xmax = row + size,
+                    ymin = col - size, ymax = col + size)
 }
 
 
 #plot the chess board- creates a list of plots of each frame
 plot_chess_board <- function(frame, tween_moves_df){
   chess_board_plot <- plot_board()
-  move_data <- tween_moves_df[which(tween_moves_df$.frame == frame),]
+  tween_moves_df <- tween_moves_df[which(tween_moves_df$.frame == frame),]
   move_plot <- chess_board_plot +
     mapply(add_pieces,
-           row = move_data$piece_row_numeric,
-           col = move_data$piece_col,
-           piece_id = move_data$.group,
+           row = tween_moves_df$piece_row_numeric,
+           col = tween_moves_df$piece_col,
+           piece_id = tween_moves_df$.group,
            size = 0.5)
 
   return(move_plot)
