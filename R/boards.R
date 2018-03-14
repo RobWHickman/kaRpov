@@ -59,7 +59,8 @@ setup_board <- function(){
                               piece_position_before = as.character(initial_poisitons),
                               piece_position_after = as.character(initial_poisitons),
                               piece_colour = initial_colours,
-                              movement = as.character(rep(NA, 32)))
+                              movement = as.character(rep(NA, 32)),
+                              piece_id = make.unique(paste0(initial_colours, initial_pieces)))
 
   return(initial_board)
 }

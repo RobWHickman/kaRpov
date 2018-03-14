@@ -7,6 +7,7 @@
 
 #functions to limit the seatch space based upon pieces in a cross from a rook/queen
 check_ranks <- function(row, col, current_move_df){
+  chess_board <- create_board()
   col_positions <- gsub(row, "", current_move_df$piece_position_before[grep(row, current_move_df$piece_position_before)])
   row_positions <- gsub(col, "", current_move_df$piece_position_before[grep(col, current_move_df$piece_position_before)])
   if(length(row_positions) == 0){
@@ -25,6 +26,7 @@ check_ranks <- function(row, col, current_move_df){
 }
 #functions to limit the seatch space based upon pieces in a diaganol cross from a bishop/queen
 check_diaganols <- function(row, col, current_move_df){
+  chess_board <- create_board()
   #find the diagonal constant
   bishop_rightwards_diagonal <- match(row, letters) - col
   #find squares

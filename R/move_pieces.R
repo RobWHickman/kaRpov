@@ -16,7 +16,6 @@ add_next_move <- function(move, move_colour, current_move_df){
   #the final position of the moving piece
   if(!grepl("O-O", move)){
     final_position <- clean_move(move)
-  }
 
   #find the index of the moving piece
   if(grepl("^[a-z]", move)){
@@ -39,23 +38,20 @@ add_next_move <- function(move, move_colour, current_move_df){
     moving_piece_index <- find_knight_position(move, current_move_df)
     #castling
   }
-  #move the piece
-  current_move_df$piece_position_after[moving_piece_index] <- final_position
+    #move the piece
+    current_move_df$piece_position_after[moving_piece_index] <- final_position
+  }
 
+  king_row <- which(current_move_df$piece_colour == move_colour & current_move_df$piece == "K")
+  rook_rows <- which(current_move_df$piece_colour == move_colour & current_move_df$piece == "R")
   if(move == "O-O"){
-    current_move_df %>%
-      .[c(piece_colour == move_colour & piece == "K"),
-        piece_position_after := gsub("^e", "g", piece_position_before)]
-    current_move_df %>%
-      .[c(piece_colour == move_colour & piece == "R" & grepl("h", piece_position_before)),
-        piece_position_after := gsub("^h", "f", piece_position_before)]
+    rook_row <- rook_rows[which(current_move_df$piece_position_before[rook_rows] == "h8")]
+    current_move_df$piece_position_after[king_row] <- gsub("e", "g", current_move_df$piece_position_before[king_row])
+    current_move_df$piece_position_after[rook_row] <- gsub("h", "f", current_move_df$piece_position_before[rook_row])
   } else if(move == "O-O-O"){
-    current_move_df %>%
-      .[c(piece_colour == move_colour & piece == "K"),
-        piece_position_after := gsub("^e", "c", piece_position_before)]
-    current_move_df %>%
-      .[c(piece_colour == move_colour & piece == "R" & grepl("h", piece_position_before)),
-        piece_position_after := gsub("^a", "d", piece_position_before)]
+    rook_row <- rook_rows[which(current_move_df$piece_position_before[rook_rows] == "a8")]
+    current_move_df$piece_position_after[king_row] <- gsub("e", "c", current_move_df$piece_position_before[king_row])
+    current_move_df$piece_position_after[rook_row] <- gsub("a", "d", current_move_df$piece_position_before[rook_row])
   }
 
   return(current_move_df)
@@ -72,31 +68,26 @@ add_all_moves <- function(pgn, initial_board, move_cutoff = NULL){
   }
 
   for(move_number in 1:total_moves){
-    next_move_no <- length(unique(paste0(all_moves_df$move, all_moves_df$player)))
     #pgn lists moves as 1. W B 2. W B ... so need to find 'round' first
-    pgn_round <- ceiling(next_move_no/2)
+    pgn_round <- ceiling(move_number/2)
     #then find which colour is taking the move
     move_colours <- c("B", "W")
-    move_colour <- move_colours[(next_move_no %% 2) + 1]
+    move_colour <- move_colours[(move_number %% 2) + 1]
 
     current_move <- get_move(pgn, move_colour, pgn_round)
 
-    #create a df to hold the move coming up
-    current_move_df <- all_moves_df %>%
-      #subset the last move
-      .[move == next_move_no - 1] %>%
-      #set the cols
-      .[, move := next_move_no] %>%
-      .[, player := as.character(move_colour)] %>%
-      .[, piece_position_before := as.character(piece_position_after)] %>%
-      .[, piece_position_after := as.character(piece_position_after)] %>%
-      .[, movement := current_move]
+    #subset the last move
+    current_move_df <- all_moves_df[which(all_moves_df$move == (move_number - 1)),]
 
-    #remove taken pieces
-    current_move_df <- remove_taken_pieces(current_move, current_move_df)
+    #set the cols
+    current_move_df$move <- move_number
+    current_move_df$player <- as.character(move_colour)
+    current_move_df$piece_position_before <- as.character(current_move_df$piece_position_after)
+    current_move_df$piece_position_after <- as.character(current_move_df$piece_position_after)
+    current_move_df$movement <- current_move
 
     #update with positions after the move
-    current_move_df <- add_next_move(move, move_colour, current_move_df)
+    current_move_df <- add_next_move(current_move, move_colour, current_move_df)
 
     all_moves_df <- rbind(all_moves_df, current_move_df)
   }

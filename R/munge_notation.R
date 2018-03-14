@@ -3,6 +3,9 @@
 #' @param position A position on the chess board (e.g. A1, B6, H2)
 #' @param move A move in algebraic chess notation (e.g. Bxc5, O-O, Qd2#)
 #' @param current_move_df The data frame containing the information on current pieces and their position
+#' @param pgn A pgn string in the form "1. MOVE MOVE 2. MOVE MOVE 3. ...."
+#' @param move_colour The colour of the piece about to move (W or B)
+#' @param pgn_round A number signifying the round of the pgn. proceeds as 1 1 2 2 3 3 4 4....end
 #'
 
 #splits up a position into a row and a col
@@ -41,8 +44,23 @@ clean_move <- function(move){
 
 #function to remove taken pieces from a df containing the pieces from the previous move
 remove_taken_pieces <- function(move, current_move_df){
-  current_move_df <- current_move_df %>%
-    .[piece_position_before != gsub(".*x", "", gsub("\\+|#", "", current_move))]
+  keep_rows <- which(current_move_df$piece_position_before != gsub(".*x", "", gsub("\\+|#", "", move)))
+  current_move_df <- current_move_df[keep_rows,]
   return(current_move_df)
+}
+
+#a function to get the total_moves of a game
+total_move_nos <- function(pgn){
+  total_moves <- length(unlist(strsplit(gsub("[0-9]\\.", "", pgn), " ")))
+  return(total_moves)
+}
+
+#a function to find the current move
+get_move <- function(pgn, move_colour, pgn_round){
+  current_move <- ifelse(move_colour == "W",
+                         strsplit(strsplit(pgn, "[0-9]*\\.")[[1]][pgn_round+1], " ")[[1]][1],
+                         strsplit(strsplit(pgn, "[0-9]*\\.")[[1]][pgn_round+1], " ")[[1]][2])
+
+  return(current_move)
 }
 
