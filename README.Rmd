@@ -39,3 +39,6 @@ plot_pgn (immortal_pgn,
           
 ```
 
+![Immortal Game](https://github.com/RobWHickman/kaRpov/blob/master/misc/immortal_game.gif)
+
+
