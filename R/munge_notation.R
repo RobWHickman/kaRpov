@@ -25,7 +25,7 @@ check_valid_square <- function(position){
 #function returns only the final position of the piece in question
 clean_move <- function(move){
   #remove checks/checkmates
-  removed_checks <- gsub("\\+|#", "", move)
+  removed_checks <- gsub("\\+|#|=", "", move)
   #remove takes x
   removed_capture <- gsub("x", "", removed_checks)
   #remove first letter indicating piece
@@ -44,7 +44,7 @@ clean_move <- function(move){
 
 #function to remove taken pieces from a df containing the pieces from the previous move
 remove_taken_pieces <- function(move, current_move_df){
-  keep_rows <- which(current_move_df$piece_position_before != gsub(".*x", "", gsub("\\+|#", "", move)))
+  keep_rows <- which(current_move_df$piece_position_before != gsub(".*x", "", gsub("\\+|#|=.", "", move)))
   current_move_df <- current_move_df[keep_rows,]
   return(current_move_df)
 }

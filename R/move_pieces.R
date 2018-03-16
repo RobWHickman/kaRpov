@@ -10,6 +10,17 @@
 
 #a function to take the move and update a df to reflect the ending positions of the pieces
 add_next_move <- function(move, move_colour, current_move_df){
+  #if a pawn has been promoted on the previous move change the piece ids to be updated
+  piece_mismatch <- which(current_move_df$piece != gsub("^[W|B]", "", gsub("\\..*", "", current_move_df$piece_id)))
+  if(length(piece_mismatch) > 0){
+    mismatch_df <- current_move_df[piece_mismatch,]
+    current_move_df <- current_move_df[-piece_mismatch,]
+
+    mismatch_df$piece_id <- paste0(mismatch_df$piece_colour, mismatch_df$piece)
+    current_move_df <- rbind(current_move_df, mismatch_df)
+    current_move_df$piece_id <- make.unique(as.character(current_move_df$piece_id))
+  }
+
   #remove pieces that are about to be taken
   current_move_df <- remove_taken_pieces(move, current_move_df)
 
@@ -21,9 +32,6 @@ add_next_move <- function(move, move_colour, current_move_df){
   if(grepl("^[a-z]", move)){
     #pawn move
     moving_piece_index <- find_pawn_position(move, move_colour, current_move_df)
-    if(grepl("=", move)){
-      current_move_df$piece[moving_piece_index] <- gsub(".*=", "", move)
-    }
   } else if(grepl("K", move)){
     #king move
     moving_piece_index <- find_king_position(move, move_colour, current_move_df)
@@ -55,6 +63,11 @@ add_next_move <- function(move, move_colour, current_move_df){
     rook_row <- rook_rows[which(current_move_df$piece_position_before[rook_rows] == "a8")]
     current_move_df$piece_position_after[king_row] <- gsub("e", "c", current_move_df$piece_position_before[king_row])
     current_move_df$piece_position_after[rook_row] <- gsub("a", "d", current_move_df$piece_position_before[rook_row])
+  }
+
+  #if a pawn is promoted change it to the piece it will become
+  if(grepl("=", move)){
+    current_move_df$piece[moving_piece_index] <- gsub(".*=", "", move)
   }
 
   return(current_move_df)

@@ -3,7 +3,7 @@
 #' @param light_col The colour of the 'white' squares of the board. Defaults to a beige-y colour
 #' @param dark_col The colour of the 'black' squares of the board. Defaults to a mid blue colour
 #' @param square_labels Whether or not the board squares should be labelled. Defaults to no
-#' @param plot whether or not to plot the board. Deafults to yes
+#' @param plot whether or not to plot the board. Deafults to no
 #'
 #' @import ggplot2
 
@@ -18,7 +18,7 @@ create_board <- function(){
 }
 
 #a function to create a base plot of just the board upon which we will add pieces
-plot_board <- function(light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = TRUE){
+plot_board <- function(light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = FALSE){
   #create the board df
   chess_board <- create_board()
 

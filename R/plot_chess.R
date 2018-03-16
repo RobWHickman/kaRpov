@@ -18,7 +18,8 @@ tween_moves <- function(all_moves_df, frames = 200){
   all_moves_df <- cbind(all_moves_df, stringr::str_split_fixed(all_moves_df$piece_position_after, "", 2))
   names(all_moves_df)[(ncol(all_moves_df)-1):ncol(all_moves_df)] <- c("piece_row", "piece_col")
   all_moves_df$piece_row_numeric <- match(all_moves_df$piece_row, letters)
-  all_moves_df$piece_col <- as.numeric(all_moves_df$piece_col)
+  #just as.numeric introduces (rounding?) errors
+  all_moves_df$piece_col <- as.numeric(as.character(all_moves_df$piece_col))
   all_moves_df$ease <- "linear"
 
   #select only the columns to be tweeened
@@ -58,8 +59,33 @@ plot_chess_board <- function(frame, tween_moves_df){
 }
 
 #creates a gif of the chess game
-create_chess_gif <- function(all_moves_df, speed = 20, name){
-  tween_moves_df <- tween_moves(all_moves_df, frames = 200)
+create_chess_gif <- function(tween_moves_df, speed = 20, pause_end = TRUE, black_shift = NULL, name){
+  #should the black/white moves be interleaved
+  if(!is.null(black_shift)){
+    frame_per_move <- max(tween_moves_df$.frame)/max(tween_moves_df$move)
+    shifted_frames <- round(frame_per_move * black_shift)
+    black_tween_df <- tween_moves_df[grep("^B", tween_moves_df$.group),]
+    tween_moves_df <- tween_moves_df[-grep("^B", tween_moves_df$.group),]
+    #remove the first n frames
+    black_tween_df <- black_tween_df[-which(black_tween_df$.frame %in% 0:(shifted_frames-1)),]
+    #hold onto the last n frames
+    hold_black_df <- black_tween_df[which(black_tween_df$.frame %in% c((max(black_tween_df$.frame)-shifted_frames + 1):max(black_tween_df$.frame))),]
+    #subtract the frame shift from the black_tween_df
+    black_tween_df$.frame <- black_tween_df$.frame - shifted_frames
+    tween_moves_df <- rbind(tween_moves_df, black_tween_df, hold_black_df)
+  }
+
+  #add a few extra frames at the end to pause at finish
+  if(pause_end){
+    extra_frame_no <- speed
+    last_move <- tween_moves_df[which(tween_moves_df$.frame == max(tween_moves_df$.frame)),]
+    last_frame <- unique(last_move$.frame)
+    extra_frames <- rep((last_frame+1):(last_frame+extra_frame_no), each = nrow(last_move))
+    last_move_extra <-  last_move[rep(seq_len(nrow(last_move)), extra_frame_no), ]
+    last_move_extra$.frame <- extra_frames
+    tween_moves_df <- rbind(tween_moves_df, last_move_extra)
+  }
+
   saveGIF({
     for (frame in min(tween_moves_df$.frame):max(tween_moves_df$.frame)){
       plot <- plot_chess_board(frame, tween_moves_df)
