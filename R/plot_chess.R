@@ -7,6 +7,7 @@
 #' @param size The size to plot each piece (0.5 is good)
 #' @param tween_moves_df A df of all the moves to plot interpolated between positions
 #' @param frames The number of frames the output gif should have. Affects the 'smoothness' of the gif. Defaults to 200
+#' @param interpolation The fraction of the turn after being taken apiece should remain on the board for (1 = whole next move). Defaults to 0.5
 #'
 #' @importFrom stringr str_split_fixed
 #' @import tweenr
@@ -14,7 +15,10 @@
 #' @import grid
 #' @import png
 
-tween_moves <- function(all_moves_df, frames = 200){
+tween_moves <- function(all_moves_df, frames = 200, interpolation = 0.5){
+  #need to merge in piece type later to plot the right pieces
+  merge_df <- all_moves_df[which(names(all_moves_df) %in% c("piece", "move", "piece_id"))]
+
   all_moves_df <- cbind(all_moves_df, stringr::str_split_fixed(all_moves_df$piece_position_after, "", 2))
   names(all_moves_df)[(ncol(all_moves_df)-1):ncol(all_moves_df)] <- c("piece_row", "piece_col")
   all_moves_df$piece_row_numeric <- match(all_moves_df$piece_row, letters)
@@ -29,6 +33,12 @@ tween_moves <- function(all_moves_df, frames = 200){
   tween_moves_df <- tween_elements(all_moves_df, "move", "piece_id", "ease", nframes = frames)
   tween_moves_df$move <- floor(tween_moves_df$move)
 
+  #merge back the piece types
+  names(tween_moves_df)[ncol(tween_moves_df)] <- "piece_id"
+  tween_moves_df <- merge(tween_moves_df, merge_df, by = c("move", "piece_id"))
+
+  #add back in the taken pieces for a fraction of the move after being taken
+  tween_moves_df <- interpolate_taken_pieces(tween_moves_df, interpolation = interpolation)
   return(tween_moves_df)
 }
 
@@ -36,8 +46,9 @@ tween_moves <- function(all_moves_df, frames = 200){
 get_piece_image <- function(piece) {
   rasterGrob(readPNG(paste0(find.package("kaRpov"), "/data/", piece, ".png")))
 }
-add_pieces <- function(row, col, piece_id, size) {
-  piece <- gsub("\\.[0-9]", "", piece_id)
+add_pieces <- function(row, col, piece, piece_id, size) {
+  #add the colour to the piece
+  piece <- paste0(gsub("([A-Z])(.*)", "\\1", piece_id), piece)
   annotation_custom(get_piece_image(piece),
                     xmin = row - size, xmax = row + size,
                     ymin = col - size, ymax = col + size)
@@ -52,7 +63,8 @@ plot_chess_board <- function(frame, tween_moves_df){
     mapply(add_pieces,
            row = tween_moves_df$piece_row_numeric,
            col = tween_moves_df$piece_col,
-           piece_id = tween_moves_df$.group,
+           piece = tween_moves_df$piece,
+           piece_id = tween_moves_df$piece_id,
            size = 0.5)
 
   return(move_plot)

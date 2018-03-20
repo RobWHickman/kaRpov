@@ -10,16 +10,6 @@
 
 #a function to take the move and update a df to reflect the ending positions of the pieces
 add_next_move <- function(move, move_colour, current_move_df){
-  #if a pawn has been promoted on the previous move change the piece ids to be updated
-  piece_mismatch <- which(current_move_df$piece != gsub("^[W|B]", "", gsub("\\..*", "", current_move_df$piece_id)))
-  if(length(piece_mismatch) > 0){
-    mismatch_df <- current_move_df[piece_mismatch,]
-    current_move_df <- current_move_df[-piece_mismatch,]
-
-    mismatch_df$piece_id <- paste0(mismatch_df$piece_colour, mismatch_df$piece)
-    current_move_df <- rbind(current_move_df, mismatch_df)
-    current_move_df$piece_id <- make.unique(as.character(current_move_df$piece_id))
-  }
 
   #remove pieces that are about to be taken
   current_move_df <- remove_taken_pieces(move, current_move_df)
@@ -109,4 +99,33 @@ add_all_moves <- function(pgn, initial_board, move_cutoff = NULL){
   }
 
   return(all_moves_df)
+}
+
+
+#small fix to interpolate taken pieces
+interpolate_taken_pieces <- function(tween_moves_df, interpolation){
+  all_ids <- levels(tween_moves_df$piece_id)
+
+  missing_pieces <- all_ids[which(!all_ids %in% as.character(tween_moves_df$piece_id[which(tween_moves_df$move == max(tween_moves_df$move))]))]
+
+  frame_per_move <- max(tween_moves_df$.frame)/max(tween_moves_df$move)
+  interpolated_frames <- round(frame_per_move * interpolation)
+
+  if(interpolated_frames > 0){
+    for(missing_piece in missing_pieces){
+      final_frame <- max(tween_moves_df$.frame[which(tween_moves_df$piece_id == missing_piece)])
+
+      #get the frames of the taken pieces to be held on for
+      extra_frame_numbers <- (final_frame + 1):(final_frame + interpolated_frames)
+
+      #replicate the final row for the piece n times
+      taken_piece_df <- tween_moves_df[which(tween_moves_df$piece_id == missing_piece & tween_moves_df$.frame == final_frame),]
+      taken_piece_df <- taken_piece_df[rep(seq_len(nrow(taken_piece_df)),interpolated_frames),]
+      taken_piece_df$.frame <- extra_frame_numbers
+
+      tween_moves_df <- rbind(tween_moves_df, taken_piece_df)
+    }
+  }
+
+  return(tween_moves_df)
 }
