@@ -44,4 +44,7 @@ plot_pgn (immortal_pgn,
 
 ![Immortal Game](https://github.com/RobWHickman/kaRpov/blob/master/misc/immortal_game.gif)
 
+To Do:
+- try to interface to a chess engine to get the value of the game for either side and add that to plots
+- faceting/ multiple plots at once?
 
