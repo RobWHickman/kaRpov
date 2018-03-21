@@ -7,6 +7,7 @@
 #' @param plot Whether or not to plot the board. Deafults to no
 #' @param move_cutoff Should all moves be processed or only up to a certain n. Defaults to NULL
 #' @param frames The number of frames the output gif should have. Affects the 'smoothness' of the gif. Defaults to 100. If NULL will return the number of moves * 5
+#' @param interpolation How long should pieces stay around after being taken- use 0-1. Defaults to 0.5
 #' @param speed The speed that the gif cycles through still images. Each plot will last 1/speed seconds. Defaults to 20
 #' @param pause_end Whether to add extra frames at the end to pause in the final position. Defaults to yes and adds 1s to end of the gif
 #' @param black_shift Whether to interleave the black and white moves. This isn't working yet so defaults to NULL
@@ -16,7 +17,7 @@ plot_pgn <- function(pgn,
                      #plotting the empty board
                      light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = FALSE,
                      #calculating moves
-                     move_cutoff = NULL, frames = 100,
+                     move_cutoff = NULL, frames = 100, interpolation = 0.5,
                      #producing the gif
                      speed = 20, pause_end = TRUE, black_shift = NULL,
                      name = "chess_plot.gif"){
@@ -33,8 +34,8 @@ plot_pgn <- function(pgn,
   if(is.null(frames)){
     frames <- total_move_nos(pgn) * 5
   }
-  tween_moves_df <- tween_moves(all_moves_df, frames)
+  tween_moves_df <- tween_moves(all_moves_df, frames, interpolation)
 
   #create the gif
-  create_chess_gif(tween_moves_df, speed = 20, pause_end = TRUE, black_shift = NULL, name)
+  create_chess_gif(tween_moves_df, speed, pause_end, black_shift, name)
 }

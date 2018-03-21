@@ -19,17 +19,14 @@ Example below. Uses the pgn for the [immortal game](https://en.wikipedia.org/wik
 
 ```{r plot chess game, message=FALSE,warning=FALSE}
 
+library(kaRpov)
+
 #the pgn for the immortal game
 immortal_pgn <- "1.e4 e5 2.f4 exf4 3.Bc4 Qh4+ 4.Kf1 b5 5.Bxb5 Nf6 6.Nf3 Qh6 7.d3 Nh5 8.Nh4 Qg5 9.Nf5 c6 10.g4 Nf6 11.Rg1 cxb5 12.h4 Qg6 13.h5 Qg5 14.Qf3 Ng8 15.Bxf4 Qf6 16.Nc3 Bc5 17.Nd5 Qxb2 18.Bd6 Bxg1 19.e5 Qxa1+ 20.Ke2 Na6 21.Nxg7+ Kd8 22.Qf6+ Nxf6 23.Be7#"
 
-filename <- "C:/Users/MagnusCarlsen/Desktop/chess_gif"
-pgn2 <- "1.e4 e5 2.Nf3 Nc6 3.Bb5 g6 4.Bxc6 bxc6 5.Nxe5 Bg7 6.d4 Qe7 7.f4 c5 8.O-O c4 9.b3 cxb3 10.Nc3 bxa2 11.Rb1 axb1=Q 12.Bd2 a6 13.Be3 a5 14.Bf2 a4 15.Bg3 a3 16.Bh4 a2 17.Bg3 a1=R 18.Bf2 c6 19.Bg3 c5 20.Bh4" 
+filename <- "C:/Users/MagnusCarlsen/Desktop/immortal_game"
 
-initial_board <- setup_board()
-pgn <- pgn2
-move_cutoff <- NULL
-all_moves_df <- add_all_moves(pgn, initial_board, move_cutoff = NULL)
-
+#need to fix library importing
 library(tweenr)
 library(animation)
 library(ggplot2)
@@ -39,8 +36,8 @@ library(png)
 #create the gif
 plot_pgn (immortal_pgn, 
           light_col = "#f5f5dc", dark_col = "#00688b", square_labels = FALSE, plot = FALSE,
-          move_cutoff = NULL, frames = 100,
-          speed = 10, pause_end = TRUE, black_shift = NULL,
+          move_cutoff = NULL, frames = 250, interpolation = 0.5,
+          speed = 20, pause_end = TRUE, black_shift = NULL,
           name = filename)
           
 ```
