@@ -1,11 +1,4 @@
----
-title: "Animated Chess Game Plots"
-author: "Robert Hickman"
-date: "14 March 2018"
-output: html_document
----
-
-#kaRpov - R based chess game animations
+# kaRpov - R based chess game animations
 
 A fairly messy, fairly simple package to turn the pgn of chess games into an animated plot of all the moves
 
